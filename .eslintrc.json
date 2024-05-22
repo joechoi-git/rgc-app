@@ -18,12 +18,12 @@
                 "endOfLine": "auto"
             }
         ]
-    },    
+    },
     "parserOptions": {
         "ecmaVersion": 2021,
         "sourceType": "module",
         "ecmaFeatures": {
-        "jsx": true
+            "jsx": true
         }
     },
     "env": {
@@ -33,8 +33,12 @@
     },
     "settings": {
         "react": {
-        "version": "detect"
+            "version": "detect"
+        },
+        "import/resolver": {
+            "node": {
+              "extensions": [".js", ".jsx", ".ts", ".tsx"]
+            }
         }
     }
 }
-    

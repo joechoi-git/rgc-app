@@ -23,7 +23,6 @@ import Chart from "./Chart";
 import Deposits from "./Deposits";
 import Orders from "./Orders";
 
-// @ts-expect-error props:any
 // eslint-disable-next-line  @typescript-eslint/no-explicit-any
 function Copyright(props: any) {
     return (

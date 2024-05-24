@@ -124,8 +124,9 @@ export default function Dashboard() {
                             color="inherit"
                             noWrap
                             sx={{ flexGrow: 1 }}
+                            className="underline italic"
                         >
-                            <span className="text-3xl underline">Hello world!!</span>
+                            Dashboard
                         </Typography>
                         <IconButton color="inherit">
                             <Badge badgeContent={4} color="secondary">

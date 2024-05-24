@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useTheme } from "@mui/material/styles";
 import { LineChart, axisClasses } from "@mui/x-charts";
-// eslint-disable-next-line import/named
+// eslint-disable-next-line
 import { ChartsTextStyle } from "@mui/x-charts/ChartsText";
 import Title from "./Title";
 

@@ -7,7 +7,7 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Title from "./Title";
 
-// Generate Order Data
+// Generate Data
 function createData(
     id: number,
     date: string,
@@ -31,10 +31,10 @@ function preventDefault(event: React.MouseEvent) {
     event.preventDefault();
 }
 
-export default function Orders() {
+export default function Content() {
     return (
         <React.Fragment>
-            <Title>Recent Orders</Title>
+            <Title>Clinical Concepts</Title>
             <Table size="small">
                 <TableHead>
                     <TableRow>

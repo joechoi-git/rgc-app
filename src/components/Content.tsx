@@ -37,10 +37,10 @@ type ClinicalConceptToDisplay = ClinicalConcept & {
 };
 
 // a custom action for delete
-function DeleteUserActionItem({
-    deleteUser,
+function DeleteActionItem({
+    deleteItem,
     ...props
-}: GridActionsCellItemProps & { deleteUser: () => void }) {
+}: GridActionsCellItemProps & { deleteItem: () => void }) {
     const [open, setOpen] = React.useState(false);
 
     return (
@@ -56,7 +56,7 @@ function DeleteUserActionItem({
                     <Button
                         onClick={() => {
                             setOpen(false);
-                            deleteUser();
+                            deleteItem();
                         }}
                         color="warning"
                         variant="contained"
@@ -72,7 +72,8 @@ function DeleteUserActionItem({
 export default function Content() {
     const [rows, setRows] = React.useState<Array<ClinicalConcept>>([]);
     const [visualized, setVisualized] = React.useState<Array<ClinicalConceptToDisplay>>([]);
-    const [open, setOpen] = React.useState(false);
+    const [open, setOpen] = React.useState<boolean>(false);
+    const [errorMessage, setErrorMessage] = React.useState<string>("");
     const [form, setForm] = React.useState<ClinicalConcept>({
         id: "",
         displayName: "",
@@ -84,22 +85,6 @@ export default function Content() {
     const { authenticated } = React.useContext(AuthContext);
 
     React.useEffect(() => {
-        const getConcepts = async () => {
-            const response = await get(
-                "https://v936r8sd70.execute-api.us-west-2.amazonaws.com/Prod/concepts"
-            );
-            const payload: Array<ClinicalConcept> = JSON.parse(JSON.stringify(response.parsedBody));
-            const rows: Array<ClinicalConcept> = [];
-            if (payload.length) {
-                for (const row of payload) {
-                    rows.push({ ...row }); // , conceptId: parseInt(row.conceptId.toString())
-                }
-            }
-            rows.sort((a, b) => {
-                return parseInt(a.id) - parseInt(b.id);
-            });
-            setRows(rows);
-        };
         getConcepts();
     }, []);
 
@@ -190,16 +175,33 @@ setRows(
                         icon={<EditIcon />}
                         onClick={editRow(params.id)}
                     />,
-                    <DeleteUserActionItem
+                    <DeleteActionItem
                         key="Delete"
                         label="Delete"
                         icon={<DeleteIcon />}
-                        deleteUser={deleteRow(params.id)}
+                        deleteItem={deleteRow(params.id)}
                     />
                 ];
             }
         }
     ];
+
+    const getConcepts = async () => {
+        const response = await get(
+            "https://v936r8sd70.execute-api.us-west-2.amazonaws.com/Prod/concepts"
+        );
+        const payload: Array<ClinicalConcept> = JSON.parse(JSON.stringify(response.parsedBody));
+        const rows: Array<ClinicalConcept> = [];
+        if (payload.length) {
+            for (const row of payload) {
+                rows.push({ ...row }); // , conceptId: parseInt(row.conceptId.toString())
+            }
+        }
+        rows.sort((a, b) => {
+            return parseInt(a.id) - parseInt(b.id);
+        });
+        setRows(rows);
+    };
 
     const computeVisualized = () => {
         const visualized: Array<ClinicalConceptToDisplay> = [];
@@ -227,7 +229,7 @@ setRows(
             recursion(parent.id, 1);
         }
 
-        console.log("compute", rows, visualized);
+        // console.log("compute", rows, visualized);
         setVisualized(visualized);
     };
 
@@ -249,15 +251,34 @@ setRows(
                             ) as ClinicalConcept;
 
                             // TO DO: handle submission
-                            console.log("submitted!", formJson);
+                            console.log("onSubmit!", formJson);
 
-                            handleClose();
+                            let isValid = true;
+                            const match = rows.filter((row) => {
+                                return row.id === formJson.id.trim();
+                            });
+                            if (match.length > 0) {
+                                isValid = false;
+                            }
+                            if (!isValid) {
+                                setErrorMessage("A duplicate ID was found. Choose another one.");
+                            } else {
+                                setErrorMessage("");
+                                handleClose();
+                            }
                         }
                     }}
                 >
                     <DialogTitle>Clinical Concept</DialogTitle>
                     <DialogContent>
-                        <DialogContentText>{form.id === "" ? "Add New" : "Edit"}</DialogContentText>
+                        <DialogContentText>
+                            {form.id === "" ? "Add New" : "Edit"}
+                            {errorMessage ? (
+                                <span style={{ color: "red" }} className="ml-3">
+                                    Error: {errorMessage}
+                                </span>
+                            ) : null}
+                        </DialogContentText>
                         <TextField
                             required
                             label="Concept ID"

@@ -1,31 +1,10 @@
-/*
-// https://v936r8sd70.execute-api.us-west-2.amazonaws.com/Prod/concepts
-async function fetchMoviesBadStatus() {
-    const response = await fetch('/oops');
-  
-    if (!response.ok) {
-      const message = `An error has occured: ${response.status}`;
-      throw new Error(message);
-    }
-  
-    const movies = await response.json();
-    return movies;
-  }
-  
-  fetchMoviesBadStatus().catch(error => {
-    error.message; // 'An error has occurred: 404'
-  });
-
-*/
 interface HttpResponse<T> extends Response {
     parsedBody?: T;
 }
 
 export async function http<T>(request: RequestInfo): Promise<HttpResponse<T>> {
     const response: HttpResponse<T> = await fetch(request);
-
     try {
-        // const body = await response.json();
         response.parsedBody = await response.json();
     } catch (err) {
         console.error(err);

@@ -13,26 +13,12 @@ import IconButton from "@mui/material/IconButton";
 import Badge from "@mui/material/Badge";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
-import Link from "@mui/material/Link";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import { Sidebar } from "./Sidebar";
 import Content from "./Content";
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function Copyright(props: any) {
-    return (
-        <Typography variant="body2" color="text.secondary" align="center" {...props}>
-            {"Copyright © "} A demo app created by Joe Choi for{" "}
-            <Link color="inherit" href="https://www.regeneron.com/">
-                RGC
-            </Link>{" "}
-            {new Date().getFullYear()}
-            {"."}
-        </Typography>
-    );
-}
+import Copyright from "./Copyright";
 
 const drawerWidth: number = 240;
 
@@ -88,6 +74,8 @@ const defaultTheme = createTheme();
 
 export default function Dashboard() {
     const [open, setOpen] = React.useState(true);
+    // const [authorization, setAuthorization] = React.useState("anonymous");
+
     const toggleDrawer = () => {
         setOpen(!open);
     };

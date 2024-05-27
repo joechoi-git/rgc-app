@@ -20,6 +20,7 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
+import { AuthContext } from "../context/AuthContext";
 
 type ClinicalConcept = {
     id: number;
@@ -78,6 +79,7 @@ export default function Content() {
         childIds: "",
         alternateNames: ""
     });
+    const { authenticated } = React.useContext(AuthContext);
 
     React.useEffect(() => {
         const initialRows: Array<ClinicalConcept> = [
@@ -197,20 +199,25 @@ setRows(
             type: "actions",
             headerName: "Options",
             width: 100,
-            getActions: (params) => [
-                <GridActionsCellItem
-                    key="Edit"
-                    label="Edit"
-                    icon={<EditIcon />}
-                    onClick={editRow(params.id)}
-                />,
-                <DeleteUserActionItem
-                    key="Delete"
-                    label="Delete"
-                    icon={<DeleteIcon />}
-                    deleteUser={deleteRow(params.id)}
-                />
-            ]
+            getActions: (params) => {
+                if (authenticated.role !== "admin") {
+                    return [];
+                }
+                return [
+                    <GridActionsCellItem
+                        key="Edit"
+                        label="Edit"
+                        icon={<EditIcon />}
+                        onClick={editRow(params.id)}
+                    />,
+                    <DeleteUserActionItem
+                        key="Delete"
+                        label="Delete"
+                        icon={<DeleteIcon />}
+                        deleteUser={deleteRow(params.id)}
+                    />
+                ];
+            }
         }
     ];
 
@@ -345,9 +352,11 @@ setRows(
                     className="pb-3"
                 >
                     Table Representation with Column Sorting and Pagination
-                    <Button onClick={addRow} variant="contained" className="float-right">
-                        Add
-                    </Button>
+                    {authenticated.role === "admin" ? (
+                        <Button onClick={addRow} variant="contained" className="float-right">
+                            Add
+                        </Button>
+                    ) : null}
                 </Typography>
                 <div style={{ height: 400, width: "100%" }}>
                     <DataGrid

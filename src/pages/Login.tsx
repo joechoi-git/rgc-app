@@ -1,11 +1,9 @@
 import * as React from "react";
 import { useNavigate } from "react-router-dom";
 import Avatar from "@mui/material/Avatar";
-// eslint-disable-next-line
-import Button, { ButtonProps } from "@mui/material/Button";
+import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
-// eslint-disable-next-line
-import TextField, { TextFieldProps } from "@mui/material/TextField";
+import TextField from "@mui/material/TextField";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
 import Link from "@mui/material/Link";

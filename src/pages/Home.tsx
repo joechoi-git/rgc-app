@@ -13,26 +13,13 @@ import IconButton from "@mui/material/IconButton";
 import Badge from "@mui/material/Badge";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
-import Link from "@mui/material/Link";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import NotificationsIcon from "@mui/icons-material/Notifications";
-import { Sidebar } from "./Sidebar";
-import Content from "./Content";
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function Copyright(props: any) {
-    return (
-        <Typography variant="body2" color="text.secondary" align="center" {...props}>
-            {"Copyright © "} A demo app created by Joe Choi for{" "}
-            <Link color="inherit" href="https://www.regeneron.com/">
-                RGC
-            </Link>{" "}
-            {new Date().getFullYear()}
-            {"."}
-        </Typography>
-    );
-}
+import Sidebar from "../components/Sidebar";
+import Content from "../components/Content";
+import Copyright from "../components/Copyright";
+import { AuthContext } from "../context/AuthContext";
 
 const drawerWidth: number = 240;
 
@@ -86,8 +73,11 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== "open" 
 
 const defaultTheme = createTheme();
 
-export default function Dashboard() {
+export default function Home() {
     const [open, setOpen] = React.useState(true);
+
+    const { authenticated } = React.useContext(AuthContext);
+
     const toggleDrawer = () => {
         setOpen(!open);
     };
@@ -124,6 +114,9 @@ export default function Dashboard() {
                         >
                             RGC App
                         </Typography>
+                        <Typography component="h6" variant="body1" color="inherit" noWrap>
+                            Welcome {authenticated.email} ({authenticated.role})
+                        </Typography>
                         <IconButton color="inherit">
                             <Badge badgeContent={0} color="secondary">
                                 <NotificationsIcon />
@@ -146,7 +139,9 @@ export default function Dashboard() {
                         </IconButton>
                     </Toolbar>
                     <Divider />
-                    <List component="nav">{Sidebar}</List>
+                    <List component="nav">
+                        <Sidebar />
+                    </List>
                 </Drawer>
                 {/* Main Content */}
                 <Box

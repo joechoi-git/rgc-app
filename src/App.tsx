@@ -1,8 +1,28 @@
 import React from "react";
-import Dashboard from "./Dashboard";
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
+import { AuthProvider, AuthContext } from "./context/AuthContext";
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+
+const PrivateRoutes = () => {
+    const { authenticated } = React.useContext(AuthContext);
+    if (authenticated.role === "") return <Navigate to="/login" replace />;
+    return <Outlet />;
+};
 
 function App() {
-    return <Dashboard />;
+    return (
+        <BrowserRouter>
+            <AuthProvider>
+                <Routes>
+                    <Route path="/login" element={<Login />} />
+                    <Route element={<PrivateRoutes />}>
+                        <Route path="/" element={<Home />} />
+                    </Route>
+                </Routes>
+            </AuthProvider>
+        </BrowserRouter>
+    );
 }
 
 export default App;

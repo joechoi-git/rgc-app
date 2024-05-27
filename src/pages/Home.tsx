@@ -16,9 +16,9 @@ import Grid from "@mui/material/Grid";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import NotificationsIcon from "@mui/icons-material/Notifications";
-import { Sidebar } from "./Sidebar";
-import Content from "./Content";
-import Copyright from "./Copyright";
+import { Sidebar } from "../components/Sidebar";
+import Content from "../components/Content";
+import Copyright from "../components/Copyright";
 
 const drawerWidth: number = 240;
 
@@ -72,7 +72,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== "open" 
 
 const defaultTheme = createTheme();
 
-export default function Dashboard() {
+export default function Home() {
     const [open, setOpen] = React.useState(true);
     // const [authorization, setAuthorization] = React.useState("anonymous");
 

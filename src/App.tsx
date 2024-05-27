@@ -1,16 +1,30 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom"; // Link: <Link to="/">Dashboard</Link>
-import Dashboard from "./Dashboard";
-import Login from "./Login";
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom"; // Link: <Link to="/">Dashboard</Link>
+import { AuthProvider, AuthContext } from "./context/AuthContext";
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+
+const PrivateRoutes = () => {
+    const { authenticated } = React.useContext(AuthContext);
+    if (!authenticated) return <Navigate to="/login" replace />;
+    return <Outlet />;
+};
 
 function App() {
+    const { authenticated } = React.useContext(AuthContext);
+    console.log("authenticated", authenticated);
+
     return (
-        <Router>
-            <Routes>
-                <Route path="/" element={<Dashboard />} />
-                <Route path="/login" element={<Login />} />
-            </Routes>
-        </Router>
+        <BrowserRouter>
+            <AuthProvider>
+                <Routes>
+                    <Route path="/login" element={<Login />} />
+                    <Route element={<PrivateRoutes />}>
+                        <Route path="/" element={<Home />} />
+                    </Route>
+                </Routes>
+            </AuthProvider>
+        </BrowserRouter>
     );
 }
 

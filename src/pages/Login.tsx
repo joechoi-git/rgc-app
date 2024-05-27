@@ -12,18 +12,31 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import Copyright from "./Copyright";
+import Copyright from "../components/Copyright";
+
+import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
 
 const defaultTheme = createTheme();
 
 export default function Login() {
+    const { authenticated, setAuthenticated } = React.useContext(AuthContext);
+
+    const navigate = useNavigate();
+
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
+        console.log("handleSubmit", authenticated, data);
+
+        setAuthenticated(true);
+        navigate("/");
+        /*
         console.log({
             email: data.get("email"),
             password: data.get("password")
         });
+        */
     };
 
     return (

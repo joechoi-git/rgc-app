@@ -24,7 +24,7 @@ import Content from "./Content";
 function Copyright(props: any) {
     return (
         <Typography variant="body2" color="text.secondary" align="center" {...props}>
-            {"Copyright © "}
+            {"Copyright © "} A demo app created by Joe Choi for{" "}
             <Link color="inherit" href="https://www.regeneron.com/">
                 RGC
             </Link>{" "}
@@ -125,7 +125,7 @@ export default function Dashboard() {
                             RGC App
                         </Typography>
                         <IconButton color="inherit">
-                            <Badge badgeContent={4} color="secondary">
+                            <Badge badgeContent={0} color="secondary">
                                 <NotificationsIcon />
                             </Badge>
                         </IconButton>

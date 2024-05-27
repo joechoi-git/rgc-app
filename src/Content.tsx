@@ -34,51 +34,6 @@ type ClinicalConceptToDisplay = ClinicalConcept & {
     depth: number;
 };
 
-const initialRows: Array<ClinicalConcept> = [
-    {
-        id: 1,
-        displayName: "Diagnosis",
-        description: "Entity domain",
-        parentIds: "",
-        childIds: "2,3",
-        alternateNames: ""
-    },
-    {
-        id: 2,
-        displayName: "Disease of Nervous System",
-        description: "Diseases targeting the nervous system",
-        parentIds: "1",
-        childIds: "4",
-        alternateNames: ""
-    },
-    {
-        id: 3,
-        displayName: "Disease of Eye",
-        description: "Diseases targeting the eye",
-        parentIds: "1",
-        childIds: "8,9",
-        alternateNames: ""
-    },
-    {
-        id: 4,
-        displayName: "Physical Disorders",
-        description: "Physical Disorders",
-        parentIds: "1",
-        childIds: "8,9",
-        alternateNames: ""
-    },
-    {
-        id: 5,
-        displayName: "Multiple Sclerosis (MS)",
-        description: "Multiple Sclerosis",
-        parentIds: "2,4",
-        childIds: "5,6,7",
-        alternateNames: "MS,name1,name2"
-    }
-];
-
-type Row = (typeof initialRows)[number];
-
 // a custom action for delete
 function DeleteUserActionItem({
     deleteUser,
@@ -113,8 +68,7 @@ function DeleteUserActionItem({
 }
 
 export default function Content() {
-    // TO DO: load rows via API
-    const [rows, setRows] = React.useState<Row[]>(initialRows);
+    const [rows, setRows] = React.useState<Array<ClinicalConcept>>([]);
     const [open, setOpen] = React.useState(false);
     const [form, setForm] = React.useState<ClinicalConcept>({
         id: -1,
@@ -125,8 +79,53 @@ export default function Content() {
         alternateNames: ""
     });
 
+    React.useEffect(() => {
+        const initialRows: Array<ClinicalConcept> = [
+            {
+                id: 1,
+                displayName: "Diagnosis",
+                description: "Entity domain",
+                parentIds: "",
+                childIds: "2,3",
+                alternateNames: ""
+            },
+            {
+                id: 2,
+                displayName: "Disease of Nervous System",
+                description: "Diseases targeting the nervous system",
+                parentIds: "1",
+                childIds: "4",
+                alternateNames: ""
+            },
+            {
+                id: 3,
+                displayName: "Disease of Eye",
+                description: "Diseases targeting the eye",
+                parentIds: "1",
+                childIds: "8,9",
+                alternateNames: ""
+            },
+            {
+                id: 4,
+                displayName: "Physical Disorders",
+                description: "Physical Disorders",
+                parentIds: "1",
+                childIds: "8,9",
+                alternateNames: ""
+            },
+            {
+                id: 5,
+                displayName: "Multiple Sclerosis (MS)",
+                description: "Multiple Sclerosis",
+                parentIds: "2,4",
+                childIds: "5,6,7",
+                alternateNames: "MS,name1,name2"
+            }
+        ];
+        setRows(initialRows);
+    }, []);
+
     const handleClickOpen = (id: number) => {
-        console.log("handleClickOpen", id, form);
         // pre-populate
         if (id !== -1) {
             const match = rows.filter((row: ClinicalConcept) => {
@@ -134,7 +133,6 @@ export default function Content() {
                     return row;
                 }
             });
-            console.log("match", match);
             if (match.length > 0) {
                 setForm({
                     id: match[0].id,
@@ -175,7 +173,7 @@ setRows(
             );
             */
         },
-        []
+        [rows]
     );
 
     const deleteRow = React.useCallback(
@@ -184,7 +182,7 @@ setRows(
                 setRows((prevRows) => prevRows.filter((row) => row.id !== id));
             });
         },
-        []
+        [rows]
     );
 
     const columns: GridColDef[] = [

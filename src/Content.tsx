@@ -1,6 +1,8 @@
 import * as React from "react";
 // eslint-disable-next-line
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { DataGrid, GridActionsCellItem, GridRowId, GridColDef } from "@mui/x-data-grid";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 
@@ -17,16 +19,7 @@ type ClinicalConceptToDisplay = ClinicalConcept & {
     depth: number;
 };
 
-const columns: GridColDef[] = [
-    { field: "id", headerName: "Concept ID", type: "number", width: 100 },
-    { field: "displayName", headerName: "Display Name", width: 150 },
-    { field: "description", headerName: "Description", width: 300 },
-    { field: "parentIds", headerName: "Parent IDs", width: 100 },
-    { field: "childIds", headerName: "Child IDs", width: 100 },
-    { field: "alternateNames", headerName: "Alternate Names", width: 150 }
-];
-
-const rows: Array<ClinicalConcept> = [
+const initialRows: Array<ClinicalConcept> = [
     {
         id: 1,
         displayName: "Diagnosis",
@@ -69,38 +62,87 @@ const rows: Array<ClinicalConcept> = [
     }
 ];
 
-const visualized: Array<ClinicalConceptToDisplay> = [];
-
-const prepareVisualized = (data: ClinicalConcept, depth: number): void => {
-    console.log("prepareVisualized", data.displayName, depth);
-    visualized.push({ ...data, depth });
-};
-
-const recursion = (parentId: number, depth: number) => {
-    // find all children
-    const children = rows.filter((row: ClinicalConcept) => {
-        const parentIds: Array<number> = row.parentIds.split(",").map((value) => parseInt(value));
-        return parentIds.includes(parentId);
-    });
-    for (const child of children) {
-        prepareVisualized(child, depth);
-        recursion(child.id, depth + 1);
-    }
-};
-
-// find the top level (without parents)
-const parents = rows.filter((row: ClinicalConcept) => {
-    return row.parentIds === "";
-});
-// start the recursion from each top level
-for (const parent of parents) {
-    prepareVisualized(parent, 0);
-    recursion(parent.id, 1);
-}
-
-console.log("visualized", visualized);
+type Row = (typeof initialRows)[number];
 
 export default function Content() {
+    const [rows, setRows] = React.useState<Row[]>(initialRows);
+
+    const deleteRow = React.useCallback(
+        (id: GridRowId) => () => {
+            setTimeout(() => {
+                setRows((prevRows) => prevRows.filter((row) => row.id !== id));
+            });
+        },
+        []
+    );
+
+    const editRow = React.useCallback(
+        (id: GridRowId) => () => {
+            setRows(
+                (prevRows) => prevRows.map((row) => (row.id === id ? { ...row } : row)) // , isAdmin: !row.isAdmin
+            );
+        },
+        []
+    );
+
+    const columns: GridColDef[] = [
+        { field: "id", headerName: "Concept ID", type: "number", width: 100 },
+        { field: "displayName", headerName: "Display Name", width: 150 },
+        { field: "description", headerName: "Description", width: 300 },
+        { field: "parentIds", headerName: "Parent IDs", width: 100 },
+        { field: "childIds", headerName: "Child IDs", width: 100 },
+        { field: "alternateNames", headerName: "Alternate Names", width: 150 },
+        {
+            field: "actions",
+            type: "actions",
+            width: 150,
+            getActions: (params) => [
+                <GridActionsCellItem
+                    key="Edit"
+                    icon={<EditIcon />}
+                    label="Edit"
+                    onClick={editRow(params.id)}
+                />,
+                <GridActionsCellItem
+                    key="Delete"
+                    icon={<DeleteIcon />}
+                    label="Delete"
+                    onClick={deleteRow(params.id)}
+                />
+            ]
+        }
+    ];
+
+    const visualized: Array<ClinicalConceptToDisplay> = [];
+
+    const prepareVisualized = (data: ClinicalConcept, depth: number): void => {
+        visualized.push({ ...data, depth });
+    };
+
+    const recursion = (parentId: number, depth: number) => {
+        // find all children
+        const children = rows.filter((row: ClinicalConcept) => {
+            const parentIds: Array<number> = row.parentIds
+                .split(",")
+                .map((value) => parseInt(value));
+            return parentIds.includes(parentId);
+        });
+        for (const child of children) {
+            prepareVisualized(child, depth);
+            recursion(child.id, depth + 1);
+        }
+    };
+
+    // find the top level (without parents)
+    const parents = rows.filter((row: ClinicalConcept) => {
+        return row.parentIds === "";
+    });
+    // start the recursion from each top level
+    for (const parent of parents) {
+        prepareVisualized(parent, 0);
+        recursion(parent.id, 1);
+    }
+
     return (
         <>
             <Paper sx={{ p: 2, display: "flex", flexDirection: "column" }}>

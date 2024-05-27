@@ -21,7 +21,7 @@ import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import { AuthContext } from "../context/AuthContext";
-import { get } from "../helper/Fetch";
+import { get, post } from "../helper/Fetch";
 
 type ClinicalConcept = {
     id: string;
@@ -35,6 +35,8 @@ type ClinicalConcept = {
 type ClinicalConceptToDisplay = ClinicalConcept & {
     depth: number;
 };
+
+const apiEndpoint = "https://v936r8sd70.execute-api.us-west-2.amazonaws.com/Prod/concepts";
 
 // a custom action for delete
 function DeleteActionItem({
@@ -187,9 +189,7 @@ setRows(
     ];
 
     const getConcepts = async () => {
-        const response = await get(
-            "https://v936r8sd70.execute-api.us-west-2.amazonaws.com/Prod/concepts"
-        );
+        const response = await get(apiEndpoint);
         const payload: Array<ClinicalConcept> = JSON.parse(JSON.stringify(response.parsedBody));
         const rows: Array<ClinicalConcept> = [];
         if (payload.length) {
@@ -201,6 +201,15 @@ setRows(
             return parseInt(a.id) - parseInt(b.id);
         });
         setRows(rows);
+    };
+
+    const postConcept = async (item: ClinicalConcept) => {
+        const response = await post<ClinicalConcept>(apiEndpoint, item);
+        console.log("response", response);
+
+        getConcepts();
+        setErrorMessage("");
+        handleClose();
     };
 
     const computeVisualized = () => {
@@ -249,10 +258,7 @@ setRows(
                                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                 (formData as any).entries()
                             ) as ClinicalConcept;
-
-                            // TO DO: handle submission
-                            console.log("onSubmit!", formJson);
-
+                            // validation
                             let isValid = true;
                             const match = rows.filter((row) => {
                                 return row.id === formJson.id.trim();
@@ -263,8 +269,17 @@ setRows(
                             if (!isValid) {
                                 setErrorMessage("A duplicate ID was found. Choose another one.");
                             } else {
-                                setErrorMessage("");
-                                handleClose();
+                                // submission
+                                const submission: ClinicalConcept = {
+                                    id: formJson.id.trim(),
+                                    displayName: formJson.displayName.trim(),
+                                    description: formJson.description.trim(),
+                                    parentIds: formJson.parentIds.trim(),
+                                    childIds: formJson.childIds.trim(),
+                                    alternateNames: formJson.alternateNames.trim()
+                                };
+                                console.log("submission", submission);
+                                postConcept(submission);
                             }
                         }
                     }}

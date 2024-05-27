@@ -13,6 +13,7 @@
         "react/prop-types": 0,
         "indent": ["error", 4],
         "linebreak-style": 1,
+        "import/named": 1,
         "quotes": ["error", "double"],
         "prettier/prettier": [
             "error",

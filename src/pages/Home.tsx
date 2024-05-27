@@ -16,7 +16,7 @@ import Grid from "@mui/material/Grid";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import NotificationsIcon from "@mui/icons-material/Notifications";
-import { Sidebar } from "../components/Sidebar";
+import Sidebar from "../components/Sidebar";
 import Content from "../components/Content";
 import Copyright from "../components/Copyright";
 
@@ -134,7 +134,9 @@ export default function Home() {
                         </IconButton>
                     </Toolbar>
                     <Divider />
-                    <List component="nav">{Sidebar}</List>
+                    <List component="nav">
+                        <Sidebar />
+                    </List>
                 </Drawer>
                 {/* Main Content */}
                 <Box

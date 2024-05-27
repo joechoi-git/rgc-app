@@ -11,9 +11,6 @@ const PrivateRoutes = () => {
 };
 
 function App() {
-    const { authenticated } = React.useContext(AuthContext);
-    console.log("authenticated", authenticated);
-
     return (
         <BrowserRouter>
             <AuthProvider>

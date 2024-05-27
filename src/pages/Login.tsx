@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useNavigate } from "react-router-dom";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -13,21 +14,19 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Copyright from "../components/Copyright";
-
-import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 
 const defaultTheme = createTheme();
 
 export default function Login() {
-    const { authenticated, setAuthenticated } = React.useContext(AuthContext);
+    const { setAuthenticated } = React.useContext(AuthContext);
 
     const navigate = useNavigate();
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
-        console.log("handleSubmit", authenticated, data);
+        console.log("handleSubmit", data);
 
         setAuthenticated(true);
         navigate("/");

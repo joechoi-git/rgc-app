@@ -1,6 +1,7 @@
 // import { createContext, ReactNode, useState } from "react";
 import * as React from "react";
-import { useNavigate } from "react-router-dom";
+import { setCookie, getCookie } from "../helper/Cookies";
+// import { useNavigate } from "react-router-dom";
 
 type Props = {
     children?: React.ReactNode;
@@ -19,11 +20,16 @@ const initialValue = {
 const AuthContext = React.createContext<IAuthContext>(initialValue);
 
 const AuthProvider = ({ children }: Props) => {
+    // initialize with cookie
+    setCookie("loggedInRole", "admin");
+    const loggedInRole = getCookie("loggedInRole");
+    console.log("loggedInRole", loggedInRole);
+
     //Initializing an auth state with false value (unauthenticated)
-    const [authenticated, setAuthenticated] = React.useState(initialValue.authenticated);
+    const [authenticated, setAuthenticated] = React.useState(loggedInRole === "admin"); // React.useState(initialValue.authenticated);
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
 
     return (
         <AuthContext.Provider value={{ authenticated, setAuthenticated }}>

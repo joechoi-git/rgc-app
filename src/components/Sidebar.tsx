@@ -7,6 +7,7 @@ import ListSubheader from "@mui/material/ListSubheader";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { AuthContext } from "../context/AuthContext";
+import { deleteCookie } from "../helper/Cookies";
 
 export default function Sidebar() {
     const { setAuthenticated } = React.useContext(AuthContext);
@@ -14,7 +15,12 @@ export default function Sidebar() {
     const navigate = useNavigate();
 
     const handleLogout = () => {
-        setAuthenticated(false);
+        deleteCookie("username");
+        deleteCookie("role");
+        setAuthenticated({
+            role: "",
+            username: ""
+        });
         navigate("/");
     };
 

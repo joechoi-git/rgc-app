@@ -6,7 +6,7 @@ import Login from "./pages/Login";
 
 const PrivateRoutes = () => {
     const { authenticated } = React.useContext(AuthContext);
-    if (!authenticated) return <Navigate to="/login" replace />;
+    if (authenticated.role === "") return <Navigate to="/login" replace />;
     return <Outlet />;
 };
 

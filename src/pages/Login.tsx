@@ -15,6 +15,7 @@ import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Copyright from "../components/Copyright";
 import { AuthContext } from "../context/AuthContext";
+import { setCookie } from "../helper/Cookies";
 
 const defaultTheme = createTheme();
 
@@ -28,14 +29,13 @@ export default function Login() {
         const data = new FormData(event.currentTarget);
         console.log("handleSubmit", data);
 
-        setAuthenticated(true);
-        navigate("/");
-        /*
-        console.log({
-            email: data.get("email"),
-            password: data.get("password")
+        setCookie("username", "joechoi");
+        setCookie("role", "admin");
+        setAuthenticated({
+            role: "admin",
+            username: "joechoi"
         });
-        */
+        navigate("/");
     };
 
     return (

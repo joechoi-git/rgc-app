@@ -1,35 +1,39 @@
-// import { createContext, ReactNode, useState } from "react";
 import * as React from "react";
-import { setCookie, getCookie } from "../helper/Cookies";
-// import { useNavigate } from "react-router-dom";
+import { getCookie } from "../helper/Cookies";
 
 type Props = {
     children?: React.ReactNode;
 };
 
+type User = {
+    role: "admin" | "viewer" | "";
+    username: string;
+};
+
 type IAuthContext = {
-    authenticated: boolean;
-    setAuthenticated: (newState: boolean) => void;
+    authenticated: User;
+    setAuthenticated: (newState: User) => void;
 };
 
-const initialValue = {
-    authenticated: false,
+const AuthContext = React.createContext<IAuthContext>({
+    authenticated: {
+        role: "",
+        username: ""
+    },
     setAuthenticated: () => {}
-};
-
-const AuthContext = React.createContext<IAuthContext>(initialValue);
+});
 
 const AuthProvider = ({ children }: Props) => {
     // initialize with cookie
-    setCookie("loggedInRole", "admin");
-    const loggedInRole = getCookie("loggedInRole");
-    console.log("loggedInRole", loggedInRole);
+    const username = getCookie("username");
+    const role = getCookie("role");
+    console.log("username", username, "role", role);
 
     //Initializing an auth state with false value (unauthenticated)
-    const [authenticated, setAuthenticated] = React.useState(loggedInRole === "admin"); // React.useState(initialValue.authenticated);
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    // const navigate = useNavigate();
+    const [authenticated, setAuthenticated] = React.useState({
+        role: role as User["role"],
+        username: username as User["username"]
+    });
 
     return (
         <AuthContext.Provider value={{ authenticated, setAuthenticated }}>

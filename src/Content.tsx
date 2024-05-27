@@ -1,10 +1,22 @@
 import * as React from "react";
-// eslint-disable-next-line
-import { DataGrid, GridActionsCellItem, GridRowId, GridColDef } from "@mui/x-data-grid";
+import {
+    DataGrid,
+    GridActionsCellItem,
+    GridRowId,
+    GridColDef,
+    GridActionsCellItemProps
+} from "@mui/x-data-grid";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
+
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogActions from "@mui/material/DialogActions";
+import Button from "@mui/material/Button";
 
 type ClinicalConcept = {
     id: number;
@@ -64,6 +76,37 @@ const initialRows: Array<ClinicalConcept> = [
 
 type Row = (typeof initialRows)[number];
 
+function DeleteUserActionItem({
+    deleteUser,
+    ...props
+}: GridActionsCellItemProps & { deleteUser: () => void }) {
+    const [open, setOpen] = React.useState(false);
+
+    return (
+        <React.Fragment>
+            <GridActionsCellItem {...props} onClick={() => setOpen(true)} />
+            <Dialog open={open} onClose={() => setOpen(false)}>
+                <DialogTitle>Delete this user?</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>This action cannot be undone.</DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setOpen(false)}>Cancel</Button>
+                    <Button
+                        onClick={() => {
+                            setOpen(false);
+                            deleteUser();
+                        }}
+                        color="warning"
+                    >
+                        Delete
+                    </Button>
+                </DialogActions>
+            </Dialog>
+        </React.Fragment>
+    );
+}
+
 export default function Content() {
     const [rows, setRows] = React.useState<Row[]>(initialRows);
 
@@ -103,11 +146,12 @@ export default function Content() {
                     label="Edit"
                     onClick={editRow(params.id)}
                 />,
-                <GridActionsCellItem
+                <DeleteUserActionItem
                     key="Delete"
-                    icon={<DeleteIcon />}
                     label="Delete"
-                    onClick={deleteRow(params.id)}
+                    icon={<DeleteIcon />}
+                    deleteUser={deleteRow(params.id)}
+                    closeMenuOnClick={false}
                 />
             ]
         }
@@ -120,7 +164,6 @@ export default function Content() {
     };
 
     const recursion = (parentId: number, depth: number) => {
-        // find all children
         const children = rows.filter((row: ClinicalConcept) => {
             const parentIds: Array<number> = row.parentIds
                 .split(",")
@@ -133,11 +176,10 @@ export default function Content() {
         }
     };
 
-    // find the top level (without parents)
+    // start the recursion from each top level
     const parents = rows.filter((row: ClinicalConcept) => {
         return row.parentIds === "";
     });
-    // start the recursion from each top level
     for (const parent of parents) {
         prepareVisualized(parent, 0);
         recursion(parent.id, 1);

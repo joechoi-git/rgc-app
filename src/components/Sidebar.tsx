@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-// import ListSubheader from "@mui/material/ListSubheader";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { AuthContext } from "../context/AuthContext";
@@ -28,11 +27,6 @@ export default function Sidebar() {
 
     return (
         <React.Fragment>
-            {/*}
-            <ListSubheader component="div" inset>
-                Welcome Admin
-            </ListSubheader>
-            {*/}
             <ListItemButton>
                 <ListItemIcon>
                     <DashboardIcon />

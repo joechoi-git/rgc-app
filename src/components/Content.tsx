@@ -257,7 +257,10 @@ setRows(
                                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                 (formData as any).entries()
                             ) as ClinicalConcept;
+
+                            // TO DO: handle submission
                             console.log("submitted!", formJson);
+
                             handleClose();
                         }
                     }}

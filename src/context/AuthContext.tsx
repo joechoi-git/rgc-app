@@ -7,7 +7,7 @@ type Props = {
 
 type User = {
     role: "admin" | "viewer" | "";
-    username: string;
+    email: string;
 };
 
 type IAuthContext = {
@@ -18,21 +18,20 @@ type IAuthContext = {
 const AuthContext = React.createContext<IAuthContext>({
     authenticated: {
         role: "",
-        username: ""
+        email: ""
     },
     setAuthenticated: () => {}
 });
 
 const AuthProvider = ({ children }: Props) => {
     // initialize with cookie
-    const username = getCookie("username");
+    const email = getCookie("email");
     const role = getCookie("role");
-    console.log("username", username, "role", role);
 
-    //Initializing an auth state with false value (unauthenticated)
+    // initialize context with cookie values
     const [authenticated, setAuthenticated] = React.useState({
         role: role as User["role"],
-        username: username as User["username"]
+        email: email as User["email"]
     });
 
     return (

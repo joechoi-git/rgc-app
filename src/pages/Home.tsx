@@ -19,6 +19,7 @@ import NotificationsIcon from "@mui/icons-material/Notifications";
 import Sidebar from "../components/Sidebar";
 import Content from "../components/Content";
 import Copyright from "../components/Copyright";
+import { AuthContext } from "../context/AuthContext";
 
 const drawerWidth: number = 240;
 
@@ -74,7 +75,8 @@ const defaultTheme = createTheme();
 
 export default function Home() {
     const [open, setOpen] = React.useState(true);
-    // const [authorization, setAuthorization] = React.useState("anonymous");
+
+    const { authenticated } = React.useContext(AuthContext);
 
     const toggleDrawer = () => {
         setOpen(!open);
@@ -111,6 +113,9 @@ export default function Home() {
                             sx={{ flexGrow: 1 }}
                         >
                             RGC App
+                        </Typography>
+                        <Typography component="h6" variant="body1" color="inherit" noWrap>
+                            Welcome {authenticated.email} ({authenticated.role})
                         </Typography>
                         <IconButton color="inherit">
                             <Badge badgeContent={0} color="secondary">

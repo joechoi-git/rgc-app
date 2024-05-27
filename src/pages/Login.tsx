@@ -29,13 +29,25 @@ export default function Login() {
         const data = new FormData(event.currentTarget);
         console.log("handleSubmit", data);
 
-        setCookie("username", "joechoi");
+        // TO DO: authenticate via an API endpoint
+
+        setCookie("email", "joechoi.newyork@gmail.com");
         setCookie("role", "admin");
+
         setAuthenticated({
             role: "admin",
-            username: "joechoi"
+            email: "joechoi.newyork@gmail.com"
         });
+
         navigate("/");
+    };
+
+    const handlePopulateAdmin = () => {
+        console.log("handlePopulateAdmin");
+    };
+
+    const handlePopulateViewer = () => {
+        console.log("handlePopulateViewer");
     };
 
     return (
@@ -67,6 +79,7 @@ export default function Login() {
                             autoComplete="email"
                             // eslint-disable-next-line
                             autoFocus
+                            defaultValue="joechoi.newyork@gmail.com"
                         />
                         <TextField
                             margin="normal"
@@ -77,13 +90,30 @@ export default function Login() {
                             type="password"
                             id="password"
                             autoComplete="current-password"
+                            defaultValue="abc123"
                         />
                         <FormControlLabel
                             control={<Checkbox value="remember" color="primary" />}
                             label="Remember me"
                         />
-                        <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
+                        <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 1 }}>
                             Sign In
+                        </Button>
+                        <Button
+                            fullWidth
+                            variant="outlined"
+                            sx={{ mt: 1, mb: 1 }}
+                            onClick={handlePopulateAdmin}
+                        >
+                            Populate with an Admin role
+                        </Button>
+                        <Button
+                            fullWidth
+                            variant="outlined"
+                            sx={{ mt: 1, mb: 3 }}
+                            onClick={handlePopulateViewer}
+                        >
+                            Populate with an Viewer role
                         </Button>
                         <Grid container>
                             <Grid item xs>

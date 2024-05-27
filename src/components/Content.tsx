@@ -24,7 +24,7 @@ import { AuthContext } from "../context/AuthContext";
 import { get } from "../helper/Fetch";
 
 type ClinicalConcept = {
-    id: number;
+    id: string;
     displayName: string;
     description: string;
     parentIds: string;
@@ -74,7 +74,7 @@ export default function Content() {
     const [visualized, setVisualized] = React.useState<Array<ClinicalConceptToDisplay>>([]);
     const [open, setOpen] = React.useState(false);
     const [form, setForm] = React.useState<ClinicalConcept>({
-        id: -1,
+        id: "",
         displayName: "",
         description: "",
         parentIds: "",
@@ -89,61 +89,16 @@ export default function Content() {
                 "https://v936r8sd70.execute-api.us-west-2.amazonaws.com/Prod/concepts"
             );
             const payload: Array<ClinicalConcept> = JSON.parse(JSON.stringify(response.parsedBody));
-            console.log("payload", payload);
-            const initialRows: Array<ClinicalConcept> = [];
+            const rows: Array<ClinicalConcept> = [];
             if (payload.length) {
                 for (const row of payload) {
-                    initialRows.push({ ...row, id: parseInt(row.id.toString()) });
+                    rows.push({ ...row }); // , conceptId: parseInt(row.conceptId.toString())
                 }
             }
-            console.log("initialRows PRE", initialRows);
-            /*
-            initialRows = [
-                {
-                    id: 1,
-                    displayName: "Diagnosis",
-                    description: "Entity domain",
-                    parentIds: "",
-                    childIds: "2,3",
-                    alternateNames: ""
-                },
-                {
-                    id: 2,
-                    displayName: "Disease of Nervous System",
-                    description: "Diseases targeting the nervous system",
-                    parentIds: "1",
-                    childIds: "4",
-                    alternateNames: ""
-                },
-                {
-                    id: 3,
-                    displayName: "Disease of Eye",
-                    description: "Diseases targeting the eye",
-                    parentIds: "1",
-                    childIds: "8,9",
-                    alternateNames: ""
-                },
-                {
-                    id: 4,
-                    displayName: "Physical Disorders",
-                    description: "Physical Disorders",
-                    parentIds: "1",
-                    childIds: "8,9",
-                    alternateNames: ""
-                },
-                {
-                    id: 5,
-                    displayName: "Multiple Sclerosis (MS)",
-                    description: "Multiple Sclerosis",
-                    parentIds: "2,4",
-                    childIds: "5,6,7",
-                    alternateNames: "MS,name1,name2"
-                }
-            ];
-            */
-            console.log("initialRows AFTER", initialRows);
-
-            setRows(initialRows);
+            rows.sort((a, b) => {
+                return parseInt(a.id) - parseInt(b.id);
+            });
+            setRows(rows);
         };
         getConcepts();
     }, []);
@@ -152,9 +107,9 @@ export default function Content() {
         computeVisualized();
     }, [rows]);
 
-    const handleClickOpen = (id: number) => {
+    const handleClickOpen = (id: string) => {
         // pre-populate
-        if (id !== -1) {
+        if (id !== "") {
             const match = rows.filter((row: ClinicalConcept) => {
                 if (row.id === id) {
                     return row;
@@ -172,7 +127,7 @@ export default function Content() {
             }
         } else {
             setForm({
-                id: -1,
+                id: "",
                 displayName: "",
                 description: "",
                 parentIds: "",
@@ -188,12 +143,12 @@ export default function Content() {
     };
 
     const addRow = () => {
-        handleClickOpen(-1);
+        handleClickOpen("");
     };
 
     const editRow = React.useCallback(
         (id: GridRowId) => () => {
-            handleClickOpen(parseInt(id.toString()));
+            handleClickOpen(id.toString());
             /*
 setRows(
                 (prevRows) => prevRows.map((row) => (row.id === id ? { ...row } : row)) // , isAdmin: !row.isAdmin
@@ -252,11 +207,9 @@ setRows(
             visualized.push({ ...data, depth });
         };
 
-        const recursion = (parentId: number, depth: number) => {
+        const recursion = (parentId: string, depth: number) => {
             const children = rows.filter((row: ClinicalConcept) => {
-                const parentIds: Array<number> = row.parentIds
-                    .split(",")
-                    .map((value) => parseInt(value));
+                const parentIds: Array<string> = row.parentIds.split(",").map((value) => value);
                 return parentIds.includes(parentId);
             });
             for (const child of children) {
@@ -274,7 +227,7 @@ setRows(
             recursion(parent.id, 1);
         }
 
-        console.log("computeVisualized", visualized);
+        console.log("compute", rows, visualized);
         setVisualized(visualized);
     };
 
@@ -304,13 +257,13 @@ setRows(
                 >
                     <DialogTitle>Clinical Concept</DialogTitle>
                     <DialogContent>
-                        <DialogContentText>{form.id === -1 ? "Add New" : "Edit"}</DialogContentText>
+                        <DialogContentText>{form.id === "" ? "Add New" : "Edit"}</DialogContentText>
                         <TextField
                             required
                             label="Concept ID"
                             name="id"
                             type="number"
-                            defaultValue={form.id === -1 ? "" : form.id}
+                            defaultValue={form.id === "" ? "" : form.id}
                             variant="outlined"
                             fullWidth
                             margin="dense"

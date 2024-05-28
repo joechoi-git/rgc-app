@@ -20,7 +20,7 @@ abc123
 Viewer
 
 ```text
-joechoi.newyork@gmail.com
+joechoi910@icloud.com
 abc123
 ```
 

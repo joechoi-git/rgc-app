@@ -206,8 +206,11 @@ export default function Content() {
     };
 
     const deleteConcept = async (id: string) => {
-        const response = await remove<{ id: string }>(apiEndpoint, id);
-        console.log("deleteConcept", id, response);
+        const item = {
+            id: id
+        };
+        const response = await remove<{ id: string }>(apiEndpoint, item);
+        console.log("deleteConcept", item, response);
         getConcepts();
     };
 

@@ -1,6 +1,38 @@
-# Getting Started with Create React App
+# RGC App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This is a SPA (single page application) that is hosted on [AWS Amplify](https://aws.amazon.com/amplify) at <https://main.d17x7tfmteoe3m.amplifyapp.com/>.
+It uses the React Router and React Context to facilitate user authentication and authorization.
+
+## Stack
+
+TypeScript, React, TailwindCSS, Material UI, ES Lint, and Prettier.
+
+## Test Accounts
+
+Admin
+
+```
+joechoi.newyork@gmail.com
+abc123
+```
+
+Viewer
+
+```
+joechoi.newyork@gmail.com
+abc123
+```
+
+## Installation
+
+```
+git clone https://github.com/joechoi-git/rgc-app.git
+cd rgc-app
+npm install
+npm run start
+# open http://localhost:3000 on your browser
+```
 
 ## Available Scripts
 
@@ -38,6 +70,14 @@ If you aren’t satisfied with the build tool and configuration choices, you can
 Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
 
 You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+
+### `npm run lint`
+
+Runs the ES Lint for linting files.
+
+### `npm run format`
+
+Runs the Prettier to fix formatting issues.
 
 ## Learn More
 

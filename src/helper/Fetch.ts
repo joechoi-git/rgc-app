@@ -25,8 +25,6 @@ export async function get<T>(
 
 export async function post<T>(
     path: string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    // body: any,
     body: unknown,
     args: RequestInit = { method: "post", body: JSON.stringify(body) }
 ): Promise<HttpResponse<T>> {
@@ -37,6 +35,14 @@ export async function put<T>(
     path: string,
     body: unknown,
     args: RequestInit = { method: "put", body: JSON.stringify(body) }
+): Promise<HttpResponse<T>> {
+    return await http<T>(new Request(path, args));
+}
+
+export async function remove<T>(
+    path: string,
+    body: unknown,
+    args: RequestInit = { method: "delete", body: JSON.stringify(body) }
 ): Promise<HttpResponse<T>> {
     return await http<T>(new Request(path, args));
 }

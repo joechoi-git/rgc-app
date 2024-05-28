@@ -21,7 +21,7 @@ import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import { AuthContext } from "../context/AuthContext";
-import { get, post } from "../helper/Fetch";
+import { get, post, remove } from "../helper/Fetch";
 
 type ClinicalConcept = {
     id: string;
@@ -136,20 +136,13 @@ export default function Content() {
     const editRow = React.useCallback(
         (id: GridRowId) => () => {
             handleClickOpen(id.toString());
-            /*
-setRows(
-                (prevRows) => prevRows.map((row) => (row.id === id ? { ...row } : row)) // , isAdmin: !row.isAdmin
-            );
-            */
         },
         [rows]
     );
 
     const deleteRow = React.useCallback(
         (id: GridRowId) => () => {
-            setTimeout(() => {
-                setRows((prevRows) => prevRows.filter((row) => row.id !== id));
-            });
+            deleteConcept(id.toString());
         },
         [rows]
     );
@@ -200,16 +193,22 @@ setRows(
         rows.sort((a, b) => {
             return parseInt(a.id) - parseInt(b.id);
         });
+        console.log("getConcepts", rows.length, rows);
         setRows(rows);
     };
 
     const postConcept = async (item: ClinicalConcept) => {
         const response = await post<ClinicalConcept>(apiEndpoint, item);
-        console.log("response", response);
-
+        console.log("postConcept", item, response);
         getConcepts();
         setErrorMessage("");
         handleClose();
+    };
+
+    const deleteConcept = async (id: string) => {
+        const response = await remove<{ id: string }>(apiEndpoint, id);
+        console.log("deleteConcept", id, response);
+        getConcepts();
     };
 
     const computeVisualized = () => {

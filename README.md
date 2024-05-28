@@ -24,6 +24,16 @@ joechoi.newyork@gmail.com
 abc123
 ```
 
+## Installation
+
+```
+git clone https://github.com/joechoi-git/rgc-app.git
+cd rgc-app
+npm install
+npm run start
+# open http://localhost:3000 on your browser
+```
+
 ## Available Scripts
 
 In the project directory, you can run:

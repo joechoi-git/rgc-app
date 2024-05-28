@@ -47,7 +47,7 @@ export default function Login() {
 
         // TO DO: authenticate via an API endpoint
         if (
-            (email === "joechoi.newyork@gmail.com" || email === "george.mitra@regeneron.com") &&
+            (email === "joechoi.newyork@gmail.com" || email === "joechoi910@icloud.com") &&
             password === defaultPassword
         ) {
             const role = email === "joechoi.newyork@gmail.com" ? "admin" : "viewer";
@@ -69,7 +69,7 @@ export default function Login() {
     };
 
     const handlePopulateViewer = () => {
-        setEmail("george.mitra@regeneron.com");
+        setEmail("joechoi910@icloud.com");
         setPassword(defaultPassword);
     };
 

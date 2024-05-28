@@ -12,21 +12,21 @@ TypeScript, React, TailwindCSS, Material UI, ES Lint, and Prettier.
 
 Admin
 
-```
+```text
 joechoi.newyork@gmail.com
 abc123
 ```
 
 Viewer
 
-```
+```text
 joechoi.newyork@gmail.com
 abc123
 ```
 
 ## Installation
 
-```
+```bash
 git clone https://github.com/joechoi-git/rgc-app.git
 cd rgc-app
 npm install

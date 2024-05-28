@@ -190,7 +190,7 @@ export default function Content() {
         const rows: Array<ClinicalConcept> = [];
         if (payload.length) {
             for (const row of payload) {
-                rows.push({ ...row }); // , conceptId: parseInt(row.conceptId.toString())
+                rows.push({ ...row });
             }
         }
         rows.sort((a, b) => {
@@ -243,7 +243,6 @@ export default function Content() {
             recursion(parent.id, 1);
         }
 
-        // console.log("compute", rows, visualized);
         setVisualized(visualized);
     };
 
@@ -315,7 +314,7 @@ export default function Content() {
                                     childIds: formJson.childIds.trim(),
                                     alternateNames: formJson.alternateNames.trim()
                                 };
-                                console.log("submission", submission);
+                                console.log("posting", submission);
                                 postConcept(submission);
                             }
                         }

@@ -46,11 +46,3 @@ export async function remove<T>(
 ): Promise<HttpResponse<T>> {
     return await http<T>(new Request(path, args));
 }
-
-/*
-// example consuming code
-const response = await post<{ id: number }>("https://jsonplaceholder.typicode.com/posts", {
-    title: "my post",
-    body: "some content"
-});
-*/

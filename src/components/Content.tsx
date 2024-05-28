@@ -21,9 +21,11 @@ import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import { AuthContext } from "../context/AuthContext";
+import { get, post, remove } from "../helper/Fetch";
 
 type ClinicalConcept = {
-    id: number;
+    id: string;
+    initialId?: string;
     displayName: string;
     description: string;
     parentIds: string;
@@ -35,11 +37,13 @@ type ClinicalConceptToDisplay = ClinicalConcept & {
     depth: number;
 };
 
+const apiEndpoint = "https://v936r8sd70.execute-api.us-west-2.amazonaws.com/Prod/concepts";
+
 // a custom action for delete
-function DeleteUserActionItem({
-    deleteUser,
+function DeleteActionItem({
+    deleteItem,
     ...props
-}: GridActionsCellItemProps & { deleteUser: () => void }) {
+}: GridActionsCellItemProps & { deleteItem: () => void }) {
     const [open, setOpen] = React.useState(false);
 
     return (
@@ -55,7 +59,7 @@ function DeleteUserActionItem({
                     <Button
                         onClick={() => {
                             setOpen(false);
-                            deleteUser();
+                            deleteItem();
                         }}
                         color="warning"
                         variant="contained"
@@ -70,9 +74,11 @@ function DeleteUserActionItem({
 
 export default function Content() {
     const [rows, setRows] = React.useState<Array<ClinicalConcept>>([]);
-    const [open, setOpen] = React.useState(false);
+    const [visualized, setVisualized] = React.useState<Array<ClinicalConceptToDisplay>>([]);
+    const [open, setOpen] = React.useState<boolean>(false);
+    const [errorMessage, setErrorMessage] = React.useState<string>("");
     const [form, setForm] = React.useState<ClinicalConcept>({
-        id: -1,
+        id: "",
         displayName: "",
         description: "",
         parentIds: "",
@@ -82,54 +88,16 @@ export default function Content() {
     const { authenticated } = React.useContext(AuthContext);
 
     React.useEffect(() => {
-        const initialRows: Array<ClinicalConcept> = [
-            {
-                id: 1,
-                displayName: "Diagnosis",
-                description: "Entity domain",
-                parentIds: "",
-                childIds: "2,3",
-                alternateNames: ""
-            },
-            {
-                id: 2,
-                displayName: "Disease of Nervous System",
-                description: "Diseases targeting the nervous system",
-                parentIds: "1",
-                childIds: "4",
-                alternateNames: ""
-            },
-            {
-                id: 3,
-                displayName: "Disease of Eye",
-                description: "Diseases targeting the eye",
-                parentIds: "1",
-                childIds: "8,9",
-                alternateNames: ""
-            },
-            {
-                id: 4,
-                displayName: "Physical Disorders",
-                description: "Physical Disorders",
-                parentIds: "1",
-                childIds: "8,9",
-                alternateNames: ""
-            },
-            {
-                id: 5,
-                displayName: "Multiple Sclerosis (MS)",
-                description: "Multiple Sclerosis",
-                parentIds: "2,4",
-                childIds: "5,6,7",
-                alternateNames: "MS,name1,name2"
-            }
-        ];
-        setRows(initialRows);
+        getConcepts();
     }, []);
 
-    const handleClickOpen = (id: number) => {
+    React.useEffect(() => {
+        computeVisualized();
+    }, [rows]);
+
+    const handleClickOpen = (id: string) => {
         // pre-populate
-        if (id !== -1) {
+        if (id !== "") {
             const match = rows.filter((row: ClinicalConcept) => {
                 if (row.id === id) {
                     return row;
@@ -138,6 +106,7 @@ export default function Content() {
             if (match.length > 0) {
                 setForm({
                     id: match[0].id,
+                    initialId: match[0].id,
                     displayName: match[0].displayName,
                     description: match[0].description,
                     parentIds: match[0].parentIds,
@@ -147,7 +116,8 @@ export default function Content() {
             }
         } else {
             setForm({
-                id: -1,
+                id: "",
+                initialId: "",
                 displayName: "",
                 description: "",
                 parentIds: "",
@@ -163,26 +133,19 @@ export default function Content() {
     };
 
     const addRow = () => {
-        handleClickOpen(-1);
+        handleClickOpen("");
     };
 
     const editRow = React.useCallback(
         (id: GridRowId) => () => {
-            handleClickOpen(parseInt(id.toString()));
-            /*
-setRows(
-                (prevRows) => prevRows.map((row) => (row.id === id ? { ...row } : row)) // , isAdmin: !row.isAdmin
-            );
-            */
+            handleClickOpen(id.toString());
         },
         [rows]
     );
 
     const deleteRow = React.useCallback(
         (id: GridRowId) => () => {
-            setTimeout(() => {
-                setRows((prevRows) => prevRows.filter((row) => row.id !== id));
-            });
+            deleteConcept(id.toString());
         },
         [rows]
     );
@@ -210,43 +173,78 @@ setRows(
                         icon={<EditIcon />}
                         onClick={editRow(params.id)}
                     />,
-                    <DeleteUserActionItem
+                    <DeleteActionItem
                         key="Delete"
                         label="Delete"
                         icon={<DeleteIcon />}
-                        deleteUser={deleteRow(params.id)}
+                        deleteItem={deleteRow(params.id)}
                     />
                 ];
             }
         }
     ];
 
-    const visualized: Array<ClinicalConceptToDisplay> = [];
-    const prepareVisualized = (data: ClinicalConcept, depth: number): void => {
-        visualized.push({ ...data, depth });
-    };
-
-    const recursion = (parentId: number, depth: number) => {
-        const children = rows.filter((row: ClinicalConcept) => {
-            const parentIds: Array<number> = row.parentIds
-                .split(",")
-                .map((value) => parseInt(value));
-            return parentIds.includes(parentId);
-        });
-        for (const child of children) {
-            prepareVisualized(child, depth);
-            recursion(child.id, depth + 1);
+    const getConcepts = async () => {
+        const response = await get(apiEndpoint);
+        const payload: Array<ClinicalConcept> = JSON.parse(JSON.stringify(response.parsedBody));
+        const rows: Array<ClinicalConcept> = [];
+        if (payload.length) {
+            for (const row of payload) {
+                rows.push({ ...row });
+            }
         }
+        rows.sort((a, b) => {
+            return parseInt(a.id) - parseInt(b.id);
+        });
+        console.log("getConcepts", rows.length, rows);
+        setRows(rows);
     };
 
-    // start the recursion from each top level
-    const parents = rows.filter((row: ClinicalConcept) => {
-        return row.parentIds === "";
-    });
-    for (const parent of parents) {
-        prepareVisualized(parent, 0);
-        recursion(parent.id, 1);
-    }
+    const postConcept = async (item: ClinicalConcept) => {
+        const response = await post<ClinicalConcept>(apiEndpoint, item);
+        console.log("postConcept", item, response);
+        getConcepts();
+        setErrorMessage("");
+        handleClose();
+    };
+
+    const deleteConcept = async (id: string) => {
+        const item = {
+            id: id
+        };
+        const response = await remove<{ id: string }>(apiEndpoint, item);
+        console.log("deleteConcept", item, response);
+        getConcepts();
+    };
+
+    const computeVisualized = () => {
+        const visualized: Array<ClinicalConceptToDisplay> = [];
+        const prepareVisualized = (data: ClinicalConcept, depth: number): void => {
+            visualized.push({ ...data, depth });
+        };
+
+        const recursion = (parentId: string, depth: number) => {
+            const children = rows.filter((row: ClinicalConcept) => {
+                const parentIds: Array<string> = row.parentIds.split(",").map((value) => value);
+                return parentIds.includes(parentId);
+            });
+            for (const child of children) {
+                prepareVisualized(child, depth);
+                recursion(child.id, depth + 1);
+            }
+        };
+
+        // start the recursion from each top level
+        const parents = rows.filter((row: ClinicalConcept) => {
+            return row.parentIds === "";
+        });
+        for (const parent of parents) {
+            prepareVisualized(parent, 0);
+            recursion(parent.id, 1);
+        }
+
+        setVisualized(visualized);
+    };
 
     return (
         <>
@@ -264,26 +262,88 @@ setRows(
                                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                 (formData as any).entries()
                             ) as ClinicalConcept;
-
-                            // TO DO: handle submission
-                            console.log("submitted!", formJson);
-
-                            handleClose();
+                            // validate id
+                            let isValid = true;
+                            const match = rows.filter((row) => {
+                                return row.id === formJson.id.trim();
+                            });
+                            if (match.length > 0) {
+                                if (
+                                    formJson.initialId !== "" &&
+                                    formJson.initialId === formJson.id
+                                ) {
+                                    isValid = true;
+                                } else {
+                                    isValid = false;
+                                    setErrorMessage(
+                                        "A duplicate ID was found. Choose another one."
+                                    );
+                                }
+                            }
+                            if (formJson.initialId !== "" && formJson.initialId !== formJson.id) {
+                                isValid = false;
+                                setErrorMessage("You cannot change an existing ID.");
+                            }
+                            // validate parent ids
+                            const parentIds = formJson.parentIds.trim().split(",");
+                            parentIds.forEach((id) => {
+                                if (isNaN(Number(id))) {
+                                    isValid = false;
+                                    setErrorMessage(
+                                        "Parent IDs can only contain numbers and commas."
+                                    );
+                                }
+                            });
+                            // validate child ids
+                            const childIds = formJson.childIds.trim().split(",");
+                            childIds.forEach((id) => {
+                                if (isNaN(Number(id))) {
+                                    isValid = false;
+                                    setErrorMessage(
+                                        "Child IDs can only contain numbers and commas."
+                                    );
+                                }
+                            });
+                            // submission
+                            if (isValid) {
+                                const submission: ClinicalConcept = {
+                                    id: formJson.id.trim(),
+                                    displayName: formJson.displayName.trim(),
+                                    description: formJson.description.trim(),
+                                    parentIds: formJson.parentIds.trim(),
+                                    childIds: formJson.childIds.trim(),
+                                    alternateNames: formJson.alternateNames.trim()
+                                };
+                                console.log("posting", submission);
+                                postConcept(submission);
+                            }
                         }
                     }}
                 >
                     <DialogTitle>Clinical Concept</DialogTitle>
                     <DialogContent>
-                        <DialogContentText>{form.id === -1 ? "Add New" : "Edit"}</DialogContentText>
+                        <DialogContentText>
+                            {form.id === "" ? "Add New" : "Edit"}
+                            {errorMessage ? (
+                                <span style={{ color: "red" }} className="ml-3">
+                                    Error: {errorMessage}
+                                </span>
+                            ) : null}
+                        </DialogContentText>
                         <TextField
                             required
                             label="Concept ID"
                             name="id"
                             type="number"
-                            defaultValue={form.id === -1 ? "" : form.id}
+                            defaultValue={form.id === "" ? "" : form.id}
                             variant="outlined"
                             fullWidth
                             margin="dense"
+                        />
+                        <TextField
+                            name="initialId"
+                            type="hidden"
+                            defaultValue={form?.initialId || ""}
                         />
                         <TextField
                             required

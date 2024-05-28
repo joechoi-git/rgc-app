@@ -25,6 +25,7 @@ import { get, post, remove } from "../helper/Fetch";
 
 type ClinicalConcept = {
     id: string;
+    initialId?: string;
     displayName: string;
     description: string;
     parentIds: string;
@@ -105,6 +106,7 @@ export default function Content() {
             if (match.length > 0) {
                 setForm({
                     id: match[0].id,
+                    initialId: match[0].id,
                     displayName: match[0].displayName,
                     description: match[0].description,
                     parentIds: match[0].parentIds,
@@ -115,6 +117,7 @@ export default function Content() {
         } else {
             setForm({
                 id: "",
+                initialId: "",
                 displayName: "",
                 description: "",
                 parentIds: "",
@@ -260,18 +263,46 @@ export default function Content() {
                                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                 (formData as any).entries()
                             ) as ClinicalConcept;
-                            // validation
+                            // validate id
                             let isValid = true;
                             const match = rows.filter((row) => {
                                 return row.id === formJson.id.trim();
                             });
                             if (match.length > 0) {
-                                isValid = false;
+                                if (
+                                    formJson.initialId !== "" &&
+                                    formJson.initialId === formJson.id
+                                ) {
+                                    isValid = true;
+                                } else {
+                                    isValid = false;
+                                    setErrorMessage(
+                                        "A duplicate ID was found. Choose another one."
+                                    );
+                                }
                             }
-                            if (!isValid) {
-                                setErrorMessage("A duplicate ID was found. Choose another one.");
-                            } else {
-                                // submission
+                            // validate parent ids
+                            const parentIds = formJson.parentIds.trim().split(",");
+                            parentIds.forEach((id) => {
+                                if (isNaN(Number(id))) {
+                                    isValid = false;
+                                    setErrorMessage(
+                                        "Parent IDs can only contain numbers and commas."
+                                    );
+                                }
+                            });
+                            // validate child ids
+                            const childIds = formJson.childIds.trim().split(",");
+                            childIds.forEach((id) => {
+                                if (isNaN(Number(id))) {
+                                    isValid = false;
+                                    setErrorMessage(
+                                        "Child IDs can only contain numbers and commas."
+                                    );
+                                }
+                            });
+                            // submission
+                            if (isValid) {
                                 const submission: ClinicalConcept = {
                                     id: formJson.id.trim(),
                                     displayName: formJson.displayName.trim(),
@@ -305,6 +336,11 @@ export default function Content() {
                             variant="outlined"
                             fullWidth
                             margin="dense"
+                        />
+                        <TextField
+                            name="initialId"
+                            type="hidden"
+                            defaultValue={form?.initialId || ""}
                         />
                         <TextField
                             required

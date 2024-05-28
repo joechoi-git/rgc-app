@@ -281,6 +281,10 @@ export default function Content() {
                                     );
                                 }
                             }
+                            if (formJson.initialId !== "" && formJson.initialId !== formJson.id) {
+                                isValid = false;
+                                setErrorMessage("You cannot change an existing ID.");
+                            }
                             // validate parent ids
                             const parentIds = formJson.parentIds.trim().split(",");
                             parentIds.forEach((id) => {

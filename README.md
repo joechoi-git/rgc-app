@@ -1,7 +1,6 @@
 # RGC App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
-This is a SPA (single page application) that is hosted on [AWS Amplify](https://aws.amazon.com/amplify) at <https://main.d17x7tfmteoe3m.amplifyapp.com/>.
 It uses the React Router and React Context to facilitate user authentication and authorization.
 
 ## Stack
